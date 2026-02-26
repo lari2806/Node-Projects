@@ -36,6 +36,22 @@ async function getRandomBlock() {
     return result;
 }
 
+async function getrandomDamage(){
+     let random = Math.random();
+        let result ;
+
+        switch (true) {
+        case random < 0.50:
+            result = "BOMBA";
+            break;
+        default:
+            result = "CASCO";
+        }
+
+    return result;
+        
+}
+
 async function logRollResult(characterName, block, diceResult, attribute){
     console.log(`${characterName} 🎲 rolou um dado ${block} ${diceResult} + ${attribute} = ${diceResult + attribute}`);
 }
@@ -97,6 +113,8 @@ async function playRaceEngine(character1, character2) {
         let powerResult1 = diceResult1 + character1.PODER;
         let powerResult2 = diceResult2 + character2.PODER;
 
+        
+
         console.log(`${character1.NOME} confrontou ${character2.NOME}`);
 
         await logRollResult(
@@ -113,15 +131,30 @@ async function playRaceEngine(character1, character2) {
             character2.PODER
         );
 
-        if( powerResult1 > powerResult2 && character2.PONTOS > 0){
+        let damage = await getrandomDamage(); 
+        console.log(`O sorteado foi: ${damage}`);
+
+            
+        if(damage === "BOMBA" && powerResult1 > powerResult2 && character2.PONTOS >= 0){
+            console.log(`${character1.NOME} venceu o confronto! ${character2.NOME} perdeu dois pontos! 🐢`);
+            character2.PONTOS = Math.max(0, character2.PONTOS - 2);
+        }
+        if(damage === "BOMBA" && powerResult2 > powerResult1 &&character1.PONTOS >= 0){
+            console.log(`${character2.NOME} venceu o confronto! ${character1.NOME} perdeu dois pontos! 🐢`);
+            character1.PONTOS = Math.max(0, character1.PONTOS - 2);
+        }
+
+
+   
+        if(damage === "CASCO" && powerResult1 > powerResult2 && character2.PONTOS >= 0){
             console.log(`${character1.NOME} venceu o confronto! ${character2.NOME} perdeu um ponto! 🐢`);
-            character2.PONTOS--;
+            character2.PONTOS = Math.max(0, character2.PONTOS - 1);
         }
-        if(powerResult2 > powerResult1 &&character1.PONTOS > 0){
+        if(damage === "CASCO" && powerResult2 > powerResult1 &&character1.PONTOS >= 0){
             console.log(`${character2.NOME} venceu o confronto! ${character1.NOME} perdeu um ponto! 🐢`);
-            character1.PONTOS--;
+              character1.PONTOS = Math.max(0, character1.PONTOS - 1);
         }
-       
+    
         console.log(powerResult2 === powerResult1 ? "confronto empatado! Nenhum dos jogadores perde pontos." : "");
        
     }
